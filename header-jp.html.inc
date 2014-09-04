@@ -22,11 +22,13 @@
 <link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
 -->
 
+<!--
 <link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+-->
 
 <style>	
 	body {
-		font-family: "ff-meta-serif-web-pro", Georgia, serif;
+		font-family: "ff-meta-serif-web-pro", times, serif;
 		text-rendering: optimizeLegibility;
 		font-size: 17px;
 		margin: 0 1.0in 0 1.0in;

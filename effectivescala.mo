@@ -1,4 +1,4 @@
-<a href="http://github.com/twitter/effectivescala"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/edc6dae7a1079163caf7f17c60495bbb6d027c93/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub"></a>
+<a href="http://github.com/twitter/effectivescala"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_green_007200.png" alt="Fork me on GitHub"></a>
 
 <h1 class="header">Effective Scala</h1>
 <address>Marius Eriksen, Twitter Inc.<br />marius@twitter.com (<a href="http://twitter.com/marius">@marius</a>)</address>
@@ -6,6 +6,12 @@
 <h2>Table of Contents</h2>
 
 .TOC
+
+
+<h2>Other languages</h2>
+<a href="index-ja.html">日本語</a>
+<a href="index-ru.html">Русский</a>
+<a href="index-cn.html">简体中文</a>
 
 
 ## Introduction
@@ -135,7 +141,7 @@ no more information than <code>User.get</code>.
 <dd>e.g.: <code>import com.twitter.concurrent._</code>
 <br />Don't apply this blindly: some packages export too many names</dd>
 <dt>When using collections, qualify names by importing 
-<code>scala.collections.immutable</code> and/or <code>scala.collections.mutable</code></dt>
+<code>scala.collection.immutable</code> and/or <code>scala.collection.mutable</code></dt>
 <dd>Mutable and immutable collections have dual names. 
 Qualifiying the names makes is obvious to the reader which variant is being used (e.g. "<code>immutable.Map</code>")</dd>
 <dt>Do not use relative imports from other packages</dt>
@@ -200,7 +206,7 @@ provide API documentation. Use the following style:
 	 */
 
 Do not resort to ASCII art or other visual embellishments. Document
-APIs but do not add unecessary comments. If you find yourself adding
+APIs but do not add unnecessary comments. If you find yourself adding
 comments to explain the behavior of your code, ask first if it can be
 restructured so that it becomes obvious what it does. Prefer
 "obviously it works" to "it works, obviously" (with apologies to Hoare).
@@ -248,8 +254,8 @@ compatibility.
 
 ### Variance
 
-Variance arises when generics are combined with subtyping. They define
-how subtyping of the *contained* type relate to subtyping of the
+Variance arises when generics are combined with subtyping. Variance defines
+how subtyping of the *contained* type relates to subtyping of the
 *container* type. Because Scala has declaration site variance
 annotations, authors of common libraries -- especially collections --
 must be prolific annotators. Such annotations are important for the
@@ -319,7 +325,7 @@ purpose, but do not alias types that are self-explanatory.
 
 Don't use subclassing when an alias will do.
 
-	trait SocketFactory extends (SocketAddress) => Socket
+	trait SocketFactory extends (SocketAddress => Socket)
 	
 .LP a <code>SocketFactory</code> <em>is</em> a function that produces a <code>Socket</code>. Using a type alias
 
@@ -369,7 +375,7 @@ the reader should beware of these implications.
 Scala has a very generic, rich, powerful, and composable collections
 library; collections are high level and expose a large set of
 operations. Many collection manipulations and transformations can be
-expressed succinctly and readbly, but careless application of its
+expressed succinctly and readably, but careless application of these
 features can often lead to the opposite result. Every Scala programmer
 should read the [collections design
 document](http://www.scala-lang.org/docu/files/collections-api/collections.html);
@@ -409,7 +415,7 @@ arrow from Iterable.s to Map.nw
 EOF
 .endcmd
 
-.LP <code>Iterable[T]</code> is any collection that may be iterated over, they provides an <code>iterator</code> method (and thus <code>foreach</code>). <code>Seq[T]</code>s are collections that are <em>ordered</em>, <code>Set[T]</code>s are mathematical sets (unordered collections of unique items), and <code>Map[T]</code>s are associative arrays, also unordered.
+.LP <code>Iterable[T]</code> is any collection that may be iterated over, they provide an <code>iterator</code> method (and thus <code>foreach</code>). <code>Seq[T]</code>s are collections that are <em>ordered</em>, <code>Set[T]</code>s are mathematical sets (unordered collections of unique items), and <code>Map[T]</code>s are associative arrays, also unordered.
 
 ### Use
 
@@ -418,9 +424,9 @@ circumstances, and make programs easier to reason about since they are
 referentially transparent and are thus also threadsafe by default.
 
 *Use the `mutable` namespace explicitly.* Don't import
-`scala.collections.mutable._` and refer to `Set`, instead
+`scala.collection.mutable._` and refer to `Set`, instead
 
-	import scala.collections.mutable
+	import scala.collection.mutable
 	val set = mutable.Set()
 
 .LP makes it clear that the mutable variant is being used.
@@ -433,12 +439,21 @@ use the `Seq()` constructor, and so on:
 	val set = Set(1, 2, 3)
 	val map = Map(1 -> "one", 2 -> "two", 3 -> "three")
 
-.LP This style separates the semantics of the collection from its implementation, letting the collections library uses the most appropriate type: you need a <code>Map</code>, not necessarily a Red-Black Tree. Furthermore, these default constructors will often use specialized representations: for example, <code>Map()</code> will use a 3-field object for maps with 3 keys.
+.LP This style separates the semantics of the collection from its implementation, letting the collections library use the most appropriate type: you need a <code>Map</code>, not necessarily a Red-Black Tree. Furthermore, these default constructors will often use specialized representations: for example, <code>Map()</code> will use a 3-field object for maps with 3 keys.
 
-The corrolary to the above is: in your own methods and constructors, *receive the most generic collection
+The corollary to the above is: in your own methods and constructors, *receive the most generic collection
 type appropriate*. This typically boils down to one of the above:
 `Iterable`, `Seq`, `Set`, or `Map`. If your method needs a sequence,
-use `Seq[T]`, not `List[T]`.
+use `Seq[T]`, not `List[T]`. (A word of caution: the *default* 
+`Traversable`, `Iterable` and `Seq` types in scope – defined in 
+`scala.package` – are the `scala.collection` versions, as opposed to 
+`Map` and `Set` – defined in `Predef.scala` – which are the `scala.collection.immutable` 
+versions. This means that, for example, the default `Seq` type can 
+be both the immutable *and* mutable implementations. Thus, if your 
+method relies on a collection parameter being immutable, and you are 
+using `Traversable`, `Iterable` or `Seq`, you *must* specifically 
+require/import the immutable variant, otherwise someone *may* pass 
+you the mutable version.)
 
 <!--
 something about buffers for construction?
@@ -510,7 +525,7 @@ structures. Excessive focus on optimization is typically wasted
 effort. Remember Knuth's maxim: "Premature optimisation is the root of
 all evil."
 
-It is often approriate to use lower level collections in situations
+It is often appropriate to use lower level collections in situations
 that require better performance or space efficiency. Use arrays
 instead of lists for large sequences (the immutable `Vector`
 collections provides a referentially transparent interface to arrays);
@@ -520,7 +535,7 @@ performance matters.
 ### Java Collections
 
 Use `scala.collection.JavaConverters` to interoperate with Java collections.
-These are a set of implicits that add conversion `asJava` and `asScala` conversion
+These are a set of implicits that add `asJava` and `asScala` conversion
 methods. The use of these ensures that such conversions are explicit, aiding
 the reader:
 
@@ -571,13 +586,13 @@ most programmers.
 
 Futures allow the programmer to express concurrent computation in a
 declarative style, are composable, and have principled handling of
-failure. These qualities has convinced us that they are especially
+failure. These qualities have convinced us that they are especially
 well suited for use in functional programming languages, where this is
 the encouraged style.
 
 *Prefer transforming futures over creating your own.* Future
 transformations ensure that failures are propagated, that
-cancellations are signalled, and frees the programmer from thinking
+cancellations are signalled, and free the programmer from thinking
 about the implications of the Java memory model. Even a careful
 programmer might write the following to issue an RPC 10 times in
 sequence and then print the results:
@@ -613,7 +628,7 @@ the declarative style:
 	    if (results.length < 9)
 	      collect(result :: results)
 	    else
-	      result :: results
+	      Future.value(result :: results)
 	  }
 
 	collect() onSuccess { results =>
@@ -670,8 +685,8 @@ Async*?
 
 ## Control structures
 
-Programs in the functional style tends to require fewer traditional
-control structure, and read better when written in the declarative
+Programs in the functional style tend to require fewer traditional
+control structures, and read better when written in the declarative
 style. This typically implies breaking your logic up into several
 small methods or functions, and gluing them together with `match`
 expressions. Functional programs also tend to be more
@@ -838,7 +853,7 @@ emphasizes the transformation of values over stateful mutation,
 yielding code that is referentially transparent, providing stronger
 invariants and thus also easier to reason about. Case classes, pattern
 matching, destructuring bindings, type inference, and lightweight
-closure and method creation syntax are the tools of this trade.
+closure- and method-creation syntax are the tools of this trade.
 
 ### Case classes as algebraic data types
 
@@ -854,10 +869,10 @@ Use the following pattern when encoding ADTs with case classes:
 	case class Node[T](left: Tree[T], right: Tree[T]) extends Tree[T]
 	case class Leaf[T](value: T) extends Tree[T]
 	
-.LP the type <code>Tree[T]</code> has two constructors: <code>Node</code> and <code>Leaf</code>. Declaring the type <code>sealed</code> allows the compiler to do exhaustivity analysis since constructors cannot be added outside the source file.
+.LP The type <code>Tree[T]</code> has two constructors: <code>Node</code> and <code>Leaf</code>. Declaring the type <code>sealed</code> allows the compiler to do exhaustivity analysis since constructors cannot be added outside the source file.
 
 Together with pattern matching, such modelling results in code that is
-both succinct "obviously correct":
+both succinct and "obviously correct":
 
 	def findMin[T <: Ordered[T]](tree: Tree[T]) = tree match {
 	  case Node(left, right) => Seq(findMin(left), findMin(right)).min
@@ -871,9 +886,9 @@ readily modelled with ADTs; these occur frequently in state machines.
 ### Options
 
 The `Option` type is a container that is either empty (`None`) or full
-(`Some(value)`). They provide a safe alternative to the use of `null`,
-and should be used in their stead whenever possible. They are a 
-collection (of at most one item) and they are embellished with 
+(`Some(value)`). It provides a safe alternative to the use of `null`,
+and should be used instead of null whenever possible. Options are 
+collections (of at most one item) and they are embellished with 
 collection operations -- use them!
 
 Write
@@ -992,7 +1007,7 @@ methods
 	  def subscribe(f: PartialFunction[T, Unit])
 	}
 
-	val publisher: Publisher[Int] = ..
+	val publisher: Publisher[Int] = ...
 	publisher.subscribe {
 	  case i if isPrime(i) => println("found prime", i)
 	  case i if i%2 == 0 => count += 2
@@ -1013,7 +1028,7 @@ methods
 	val classifier1: Classifier
 	val classifier2: Classifier
 
-	val classifier = classifier1 orElse classifier2 orElse { _ => java.util.Logging.Level.FINEST }
+	val classifier: Classifier = classifier1 orElse classifier2 orElse { case _ => java.util.Logging.Level.FINEST }
 
 
 ### Destructuring bindings
@@ -1029,7 +1044,7 @@ tuples and case classes.
 	val tweet = Tweet("just tweeting", Time.now)
 	val Tweet(text, timestamp) = tweet
 
-### Lazyness
+### Laziness
 
 Fields in scala are computed *by need* when `val` is prefixed with
 `lazy`. Because fields and methods are equivalent in Scala (lest the fields
@@ -1045,7 +1060,7 @@ are `private[this]`)
 	  _theField.get
 	}
 
-.LP i.e., it computes a results and memoizes it. Use lazy fields for this purpose, but avoid using lazyness when lazyness is required by semantics. In these cases it's better to be explicit since it makes the cost model explicit, and side effects can be controlled more precisely.
+.LP i.e., it computes a results and memoizes it. Use lazy fields for this purpose, but avoid using laziness when laziness is required by semantics. In these cases it's better to be explicit since it makes the cost model explicit, and side effects can be controlled more precisely.
 
 Lazy fields are thread safe.
 
@@ -1062,7 +1077,7 @@ Only use call-by-name for such control constructs, where it is obvious
 to the caller that what is being passed in is a "block" rather than
 the result of an unsuspecting computation. Only use call-by-name arguments
 in the last position of the last argument list. When using call-by-name,
-ensure that method is named so that it is obvious to the caller that 
+ensure that the method is named so that it is obvious to the caller that 
 its argument is call-by-name.
 
 When you do want a value to be computed multiple times, and especially
@@ -1070,7 +1085,7 @@ when this computation is side effecting, use explicit functions:
 
 	class SSLConnector(mkEngine: () => SSLEngine)
 	
-.LP The intent remains obvious and caller is left without surprises.
+.LP The intent remains obvious and the caller is left without surprises.
 
 ### `flatMap`
 
@@ -1102,8 +1117,8 @@ is revealed by its signature; for some `Container[A]`
 `flatMap` is frequently useful when dealing with `Options` -- it will
 collapse chains of options down to one,
 
-	val host: Option[String] = ..
-	val port: Option[Int] = ..
+	val host: Option[String] = ...
+	val port: Option[Int] = ...
 	
 	val addr: Option[InetSocketAddress] =
 	  host flatMap { h =>
@@ -1124,7 +1139,7 @@ The use of `flatMap` in `Future`s is discussed in the
 
 ## Object oriented programming
 
-Much of Scala's vastness lie in its object system. Scala is a *pure*
+Much of Scala's vastness lies in its object system. Scala is a *pure*
 language in the sense that *all values* are objects; there is no
 distinction between primitive types and composite ones.
 Scala also features mixins allowing for more orthogonal and piecemeal
@@ -1134,7 +1149,7 @@ time with all the benefits of static type checking.
 A motivation behind the mixin system was to obviate the need for 
 traditional dependency injection. The culmination of this "component
 style" of programming is [the cake
-pattern](http://jboner.github.com/2008/10/06/real-world-scala-dependency-injection-di.html).
+pattern](http://jonasboner.com/2008/10/06/real-world-scala-dependency-injection-di/).
 
 ### Dependency injection
 
@@ -1147,7 +1162,7 @@ It's boring and simple and it works. *Use dependency injection for
 program modularization*, and in particular, *prefer composition over
 inheritance* -- for this leads to more modular and testable programs.
 When encountering a situation requiring inheritance, ask yourself: how
-you structure the program if the language lacked support for
+would you structure the program if the language lacked support for
 inheritance? The answer may be compelling.
 
 Dependency injection typically makes use of traits,
@@ -1156,7 +1171,7 @@ Dependency injection typically makes use of traits,
 	  def subscribe(f: Tweet => Unit)
 	}
 	class HosebirdStream extends TweetStream ...
-	class FileStream extends TweetStream ..
+	class FileStream extends TweetStream ...
 	
 	class TweetCounter(stream: TweetStream) {
 	  stream.subscribe { tweet => count += 1 }
@@ -1174,7 +1189,7 @@ factory types.
 ### Traits
 
 Dependency injection does not at all preclude the use of common *interfaces*, or
-the implemention of common code in traits. Quite contrary-- the use of traits are
+the implementation of common code in traits. Quite the contrary -- the use of traits are
 highly encouraged for exactly this reason: multiple interfaces
 (traits) may be implemented by a concrete class, and common code can
 be reused across all such classes.
@@ -1217,9 +1232,9 @@ A class member marked `private`,
 	
 .LP is visible to all <em>instances</em> of that class (but not their subclasses). In most cases, you want <code>private[this]</code>.
 
-	private[this] val: Int = ..
+	private[this] val x: Int = ...
 
-.LP which limits visibilty to the particular instance. The Scala compiler is also able to translate <code>private[this]</code> into a simple field access (since access is limited to the statically defined class) which can sometimes aid performance optimizations.
+.LP which limits visibility to the particular instance. The Scala compiler is also able to translate <code>private[this]</code> into a simple field access (since access is limited to the statically defined class) which can sometimes aid performance optimizations.
 
 #### Singleton class types
 
@@ -1241,11 +1256,62 @@ It's common in Scala to create singleton class types, for example
 
 Do not use structural types in normal use. They are a convenient and
 powerful feature, but unfortunately do not have an efficient
-implementation on the JVM. However -- due to an implemenation quirk -- 
+implementation on the JVM. However -- due to an implementation quirk -- 
 they provide a very nice shorthand for doing reflection.
 
 	val obj: AnyRef
 	obj.asInstanceOf[{def close()}].close()
+
+## Error handling
+
+Scala provides an exception facility, but do not use it for
+commonplace errors, when the programmer must handle errors properly
+for correctness. Instead, encode such errors explicitly: using
+`Option` or `com.twitter.util.Try` are good, idiomatic choices, as
+they harness the type system to ensure that the user is properly
+considering error handling.
+
+For example, when designing a repository, the following API may 
+be tempting:
+
+	trait Repository[Key, Value] {
+	  def get(key: Key): Value
+	}
+
+.LP but this would require the implementor to throw an exception when the key is absent. A better approach is to use an <code>Option</code>:
+
+	trait Repository[Key, Value] {
+	  def get(key: Key): Option[Value]
+	}
+
+.LP This interface makes it obvious that the repository may not contain every key, and that the programmer must handle missing keys.  Furthermore, <code>Option</code> has a number of combinators to handle these cases. For example, <code>getOrElse</code> is used to supply a default value for missing keys:
+
+	val repo: Repository[Int, String]
+	repo.get(123) getOrElse "defaultString"
+
+### Handling exceptions
+
+Because Scala's exception mechanism isn't *checked* -- the compiler
+cannot statically tell whether the programmer has covered the set of
+possible exceptions -- it is often tempting to cast a wide net when
+handling exceptions.
+
+However, some exceptions are *fatal* and should never be caught; the
+code
+
+	try {
+	  operation()
+	} catch {
+	  case _ => ...
+	}
+
+.LP is almost always wrong, as it would catch fatal errors that need to be propagated. Instead, use the <code>com.twitter.util.NonFatal</code> extractor to handle only nonfatal exceptions.
+
+	try {
+	  operation()
+	} catch {
+	  case NonFatal(exc) => ...
+	}
 
 ## Garbage collection
 
@@ -1254,7 +1320,7 @@ garbage collection concerns are largely similar to those of Java
 though idiomatic Scala code tends to generate more (short-lived)
 garbage than idiomatic Java code -- a byproduct of the functional
 style. Hotspot's generational garbage collection typically makes this
-a nonissue as short lived garbage effectively free in most circumstances
+a nonissue as short-lived garbage is effectively free in most circumstances.
 
 Before tackling GC performance issues, watch
 [this](http://www.infoq.com/presentations/JVM-Performance-Tuning-twitter)
@@ -1307,7 +1373,7 @@ Futures have been <a href="#Concurrency-Futures">discussed</a>
 briefly in the <a href="#Concurrency">concurrency section</a>. They 
 are the central mechanism for coordination asynchronous
 processes and are pervasive in our codebase and core to Finagle.
-Futures allow for the composition of concurrent events, and simplifies
+Futures allow for the composition of concurrent events, and simplify
 reasoning about highly concurrent operations. They also lend themselves
 to a highly efficient implementation on the JVM.
 
@@ -1329,8 +1395,8 @@ also be encoded: a Future can be in exactly one of 3 states: *pending*,
 into more complicated ones. The canonical example of this is function
 composition: Given functions <em>f</em> and
 <em>g</em>, the composite function <em>(g&#8728;f)(x) = g(f(x))</em> &mdash; the result
-of applying <em>x</em> to <em>f</em> first, and then the result of that
-to <em>g</em> &mdash; can be written in Scala:</p>
+of applying <em>f</em> to <em>x</em> first, and then applying <em>g</em> to the result
+of that &mdash; can be written in Scala:</p>
 
 <pre><code>val f = (i: Int) => i.toString
 val g = (s: String) => s+s+s
@@ -1355,12 +1421,12 @@ is necessarily also deferred; in
 
 Lists can be flattened;
 
-	val listOfList: List[List[Int]] = ..
+	val listOfList: List[List[Int]] = ...
 	val list: List[Int] = listOfList.flatten
 
 .LP and this makes sense for futures, too:
 
-	val futureOfFuture: Future[Future[Int]] = ..
+	val futureOfFuture: Future[Future[Int]] = ...
 	val future: Future[Int] = futureOfFuture.flatten
 
 .LP since futures are deferred, the implementation of <code>flatten</code> &mdash; it returns immediately &mdash; has to return a future that is the result of waiting for the completion of the outer future (<code><b>Future[</b>Future[Int]<b>]</b></code>) and after that the inner one (<code>Future[<b>Future[Int]</b>]</code>). If the outer future fails, the flattened future must also fail.
@@ -1393,12 +1459,11 @@ following way:
 
 #### Style
 
-Future callback methods (`respond`, `onSuccess', `onFailure`, `ensure`)
+Future callback methods (`respond`, `onSuccess`, `onFailure`, `ensure`)
 return a new future that is *chained* to its parent. This future is guaranteed
 to be completed only after its parent, enabling patterns like
 
-	acquireResource()
-	future onSuccess { value =>
+	acquireResource() onSuccess { value =>
 	  computeSomething(value)
 	} ensure {
 	  freeResource()
@@ -1409,14 +1474,14 @@ to be completed only after its parent, enabling patterns like
 Use `onSuccess` instead of `foreach` -- it is symmetrical to `onFailure` and
 is a better name for the purpose, and also allows for chaining.
 
-Always try to avoid creating your own `Promise`s: nearly every task
+Always try to avoid creating `Promise` instances directly: nearly every task
 can be accomplished via the use of predefined combinators. These
 combinators ensure errors and cancellations are propagated, and generally
 encourage *dataflow style* programming which usually <a
 href="#Concurrency-Futures">obviates the need for synchronization and
 volatility declarations</a>.
 
-Code written in tail-recursive style are not subject so space leaks,
+Code written in tail-recursive style is not subject to stack-space leaks,
 allowing for efficient implementation of loops in dataflow-style:
 
 	case class Node(parent: Option[Node], ...)
@@ -1445,14 +1510,14 @@ propagated to its producer. The producer uses `onCancellation` on
 `Promise` to listen to this signal and act accordingly.
 
 This means that the cancellation semantics depend on the producer,
-and there is no default implementation. *Cancellation is a but a hint*.
+and there is no default implementation. *Cancellation is but a hint*.
 
 #### Locals
 
 Util's
 [`Local`](https://github.com/twitter/util/blob/master/util-core/src/main/scala/com/twitter/util/Local.scala#L40)
 provides a reference cell that is local to a particular future dispatch tree. Setting the value of a local makes this
-value available to any computation deferred by a Future in the same thread. They are analagous to thread locals,
+value available to any computation deferred by a Future in the same thread. They are analogous to thread locals,
 except their scope is not a Java thread but a tree of "future threads". In
 
 	trait User {
@@ -1481,18 +1546,214 @@ creating "stack traces" for future callbacks -- where any other solution
 would unduly burden the user. Locals are inappropriate in almost any
 other situation.
 
-<!--
-  ### Offer/Broker
+### Offer/Broker
 
--->
+Concurrent systems are greatly complicated by the need to coordinate
+access to shared data and resources.
+[Actors](http://www.scala-lang.org/api/current/scala/actors/Actor.html)
+present one strategy of simplification: each actor is a sequential process
+that maintains its own state and resources, and data is shared by
+messaging with other actors. Sharing data requires communicating between
+actors.
+
+Offer/Broker builds on this in three important ways. First,
+communication channels (Brokers) are first class -- that is, you send
+messages via Brokers, not to an actor directly. Secondly, Offer/Broker
+is a synchronous mechanism: to communicate is to synchronize. This
+means we can use Brokers as a coordination mechanism: when process `a`
+has sent a message to process `b`; both `a` and `b` agree on the state
+of the system. Lastly, communication can be performed *selectively*: a
+process can propose several different communications, and exactly one
+of them will obtain.
+
+In order to support selective communication (as well as other
+composition) in a general way, we need to decouple the description of
+a communication from the act of communicating. This is what an `Offer`
+does -- it is a persistent value that describes a communication; in
+order to perform that communication (act on the offer), we synchronize
+via its `sync()` method
+
+	trait Offer[T] {
+	  def sync(): Future[T]
+	}
+
+.LP which returns a <code>Future[T]</code> that yields the exchanged value when the communication obtains.
+
+A `Broker` coordinates the exchange of values through offers -- it is the channel of communications:
+
+	trait Broker[T] {
+	  def send(msg: T): Offer[Unit]
+	  val recv: Offer[T]
+	}
+
+.LP so that, when creating two offers
+
+	val b: Broker[Int]
+	val sendOf = b.send(1)
+	val recvOf = b.recv
+
+.LP and <code>sendOf</code> and <code>recvOf</code> are both synchronized
+
+	// In process 1:
+	sendOf.sync()
+
+	// In process 2:
+	recvOf.sync()
+
+.LP both offers obtain and the value <code>1</code> is exchanged.
+
+Selective communication is performed by combining several offers with
+`Offer.choose`
+
+	def choose[T](ofs: Offer[T]*): Offer[T]
+
+.LP which yields a new offer that, when synchronized, obtains exactly one of <code>ofs</code> &mdash; the first one to become available. When several are available immediately, one is chosen at random to obtain.
+
+The `Offer` object has a number of one-off Offers that are used to compose with Offers from a Broker.
+
+	Offer.timeout(duration): Offer[Unit]
+
+.LP is an offer that activates after the given duration. <code>Offer.never</code> will never obtain, and <code>Offer.const(value)</code> obtains immediately with the given value. These are useful for composition via selective communication. For example to apply a timeout on a send operation:
+
+	Offer.choose(
+	  Offer.timeout(10.seconds),
+	  broker.send("my value")
+	).sync()
+
+It may be tempting to compare the use of Offer/Broker to
+[SynchronousQueue](http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/SynchronousQueue.html),
+but they are different in subtle but important ways. Offers can be composed in ways that such queues simply cannot. For example, consider a set of queues, represented as Brokers:
+
+	val q0 = new Broker[Int]
+	val q1 = new Broker[Int]
+	val q2 = new Broker[Int]
+	
+.LP Now let's create a merged queue for reading:
+
+	val anyq: Offer[Int] = Offer.choose(q0.recv, q1.recv, q2.recv)
+	
+.LP <code>anyq</code> is an offer that will read from first available queue. Note that <code>anyq</code> is <em>still synchronous</em> &mdash; we still have the semantics of the underlying queues. Such composition is simply not possible using queues.
+	
+#### Example: A Simple Connection Pool
+
+Connection pools are common in network applications, and they're often
+tricky to implement -- for example, it's often desirable to have
+timeouts on acquisition from the pool since various clients have different latency
+requirements. Pools are simple in principle: we maintain a queue of
+connections, and we satisfy waiters as they come in. With traditional
+synchronization primitives this typically involves keeping two queues:
+one of waiters (when there are no connections), and one of connections
+(when there are no waiters).
+
+Using Offer/Brokers, we can express this quite naturally:
+
+	class Pool(conns: Seq[Conn]) {
+	  private[this] val waiters = new Broker[Conn]
+	  private[this] val returnConn = new Broker[Conn]
+
+	  val get: Offer[Conn] = waiters.recv
+	  def put(c: Conn) { returnConn ! c }
+	
+	  private[this] def loop(connq: Queue[Conn]) {
+	    Offer.choose(
+	      if (connq.isEmpty) Offer.never else {
+	        val (head, rest) = connq.dequeue()
+	        waiters.send(head) map { _ => loop(rest) }
+	      },
+	      returnConn.recv map { c => loop(connq.enqueue(c)) }
+	    ).sync()
+	  }
+	
+	  loop(Queue.empty ++ conns)
+	}
+
+`loop` will always offer to have a connection returned, but only offer
+to send one when the queue is nonempty. Using a persistent queue simplifies
+reasoning further. The interface to the pool is also through an Offer, so if a caller
+wishes to apply a timeout, they can do so through the use of combinators:
+
+	val conn: Future[Option[Conn]] = Offer.choose(
+	  pool.get map { conn => Some(conn) },
+	  Offer.timeout(1.second) map { _ => None }
+	).sync()
+
+No extra bookkeeping was required to implement timeouts; this is due to
+the semantics of Offers: if `Offer.timeout` is selected, there is no
+longer an offer to receive from the pool -- the pool and its caller
+never simultaneously agreed to receive and send, respectively, on the
+`waiters` broker.
+
+#### Example: Sieve of Eratosthenes
+
+It is often useful -- and sometimes vastly simplifying -- to structure
+concurrent programs as a set of sequential processes that communicate
+synchronously. Offers and Brokers provide a set of tools to make this simple
+and uniform. Indeed, their application transcends what one might think
+of as "classic" concurrency problems -- concurrent programming (with
+the aid of Offer/Broker) is a useful *structuring* tool, just as
+subroutines, classes, and modules are -- another important 
+idea from CSP.
+
+One example of this is the [Sieve of
+Eratosthenes](http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes),
+which can be structured as a successive application of filters to a
+stream of integers. First, we'll need a source of integers:
+
+	def integers(from: Int): Offer[Int] = {
+	  val b = new Broker[Int]
+	  def gen(n: Int): Unit = b.send(n).sync() ensure gen(n + 1)
+	  gen(from)
+	  b.recv
+	}
+
+.LP <code>integers(n)</code> is simply the offer of all consecutive integers starting at <code>n</code>. Then we need a filter:
+
+	def filter(in: Offer[Int], prime: Int): Offer[Int] = {
+	  val b = new Broker[Int]
+	  def loop() {
+	    in.sync() onSuccess { i =>
+	      if (i % prime != 0)
+	        b.send(i).sync() ensure loop()
+	      else
+	        loop()
+	    }
+	  }
+	  loop()
+	
+	  b.recv
+	}
+
+.LP <code>filter(in, p)</code> returns the offer that removes multiples of the prime <code>p</code> from <code>in</code>. Finally, we define our sieve:
+
+	def sieve = {
+	  val b = new Broker[Int]
+	  def loop(of: Offer[Int]) {
+	    for (prime <- of.sync(); _ <- b.send(prime).sync())
+	      loop(filter(of, prime))
+	  }
+	  loop(integers(2))
+	  b.recv
+	}
+
+.LP <code>loop()</code> works simply: it reads the next (prime) number from <code>of</code>, and then applies a filter to <code>of</code> that excludes this prime. As <code>loop</code> recurses, successive primes are filtered, and we have a Sieve. We can now print out the first 10000 primes:
+
+	val primes = sieve
+	0 until 10000 foreach { _ =>
+	  println(primes.sync()())
+	}
+
+Besides being structured into simple, orthogonal components, this
+approach gives you a streaming Sieve: you do not a priori need to
+compute the set of primes you are interested in, further enhancing
+modularity.
 
 ## Acknowledgments
 
 The lessons herein are those of Twitter's Scala community -- I hope
 I've been a faithful chronicler.
 
-Blake Matheny, Nick Kallen, and Steve Gury provided much helpful
-guidance and many excellent suggestions.
+Blake Matheny, Nick Kallen, Steve Gury, and Raghavendra Prabhu
+provided much helpful guidance and many excellent suggestions.
 
 [Scala]: http://www.scala-lang.org/
 [Finagle]: http://github.com/twitter/finagle
